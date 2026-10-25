@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Personal portfolio of Mitansh Pradhan, second-year B.Tech CSE student specializing in AI and Machine Learning">
+  <title>Mitansh Pradhan | Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#home">Mitansh Pradhan</a>
+    <button id="menuToggle" class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">&#9776;</button>
+    <nav id="mainNav" class="main-nav" aria-label="Main navigation">
+      <a href="#home">Home</a>
+      <a href="#about">About Me</a>
+      <a href="#skills">Skills</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
+      <a href="#chatbot">AI Chatbot</a>
+      <button id="themeToggle" class="theme-toggle" type="button">Switch to Dark Mode</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="home" class="hero">
+      <div class="hero-text">
+        <p class="eyebrow">Hello, I am</p>
+        <h1>Mitansh Pradhan</h1>
+        <p class="tagline">Second-year B.Tech CSE student specializing in Artificial Intelligence and Machine Learning, building projects with Python, web technologies and AI tools.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#projects">View My Projects</a>
+          <a class="btn btn-outline" href="#contact">Contact Me</a>
+        </div>
+      </div>
+      <div class="hero-photo">
+        <img src="profile.jpg.jpeg" alt="Profile photograph of Mitansh Pradhan" width="260" height="260" style="transform: rotate(270deg); object-fit: cover;">
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section">
+      <h2>About Me</h2>
+      <div class="about-grid">
+        <div>
+          <p>I am Mitansh Pradhan, a second-year B.Tech Computer Science and Engineering student with a specialization in Artificial Intelligence and Machine Learning. I enjoy turning ideas into working programs and web applications.</p>
+          <p>Along the way I have built Python programs, a quiz app and a book reading list app, and I use AI tools like Cursor to write, debug and improve my code. I want to keep growing in AI and ML and build projects that solve real problems.</p>
+        </div>
+        <div class="card">
+          <h3>Education</h3>
+          <ul class="plain-list">
+            <li><strong>B.Tech in Computer Science and Engineering</strong><br>Specialization: Artificial Intelligence and Machine Learning<br>Currently in 2nd Year</li>
+            <li><strong>JECRC UNIVERSITY, JAIPUR</strong></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" class="section section-alt">
+      <h2>Skills</h2>
+      <ul class="skills-list">
+        <li>Python</li>
+        <li>HTML</li>
+        <li>CSS</li>
+        <li>JavaScript</li>
+        <li>Git and GitHub</li>
+        <li>Cursor AI</li>
+        <li>AI and Machine Learning (learning)</li>
+      </ul>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="section">
+      <h2>My Projects</h2>
+      <div class="search-bar">
+        <label for="projectSearch" class="visually-hidden">Search projects by name or technology</label>
+        <input type="search" id="projectSearch" placeholder="Search by name or technology (e.g. Python, Quiz, Book)">
+        <p id="searchStatus" class="search-status" aria-live="polite"></p>
+      </div>
+
+      <div id="projectGrid" class="project-grid">
+        <article class="project-card" data-search="python programs collection factorial fibonacci dictionary readme">
+          <h3>Python Programs Collection</h3>
+          <p>Factorial, Fibonacci and Structure-to-Dictionary conversion programs, with an updated README for the repository.</p>
+          <ul class="tags"><li>Python</li><li>Git</li><li>Markdown</li></ul>
+          <div class="card-links">
+            <a href="https://github.com/mitanshpradhank21-hash/pythonbasic-25bcon2074" target="_blank" rel="noopener">GitHub Repo</a>
+            <a href="https://github.com/mitanshpradhank21-hash/pythonbasic3-25bcon2074" target="_blank" rel="noopener">Python Basics 3 Repo</a>
+          </div>
+        </article>
+
+        <article class="project-card" data-search="messy python code improvement ai refactor">
+          <h3>Messy Python Code Improvement</h3>
+          <p>A messy Python script cleaned up and improved with AI assistance for readability and structure.</p>
+          <ul class="tags"><li>Python</li><li>Cursor AI</li><li>Refactoring</li></ul>
+          <div class="card-links">
+            <a href="https://github.com/mitanshpradhank21-hash/pythonbasic2-25bcon2074" target="_blank" rel="noopener">GitHub Repo</a>
+          </div>
+        </article>
+
+        <article class="project-card" data-search="bug fixing cursor ai buggy program debug">
+          <h3>Bug Fixing Using Cursor AI</h3>
+          <p>A Python debugging project focused on identifying and correcting an error with the help of Cursor AI.</p>
+          <ul class="tags"><li>Python</li><li>Cursor AI</li><li>Debugging</li></ul>
+          <div class="card-links">
+            <a href="https://github.com/mitanshpradhank21-hash/buggyfix-25bcon2074" target="_blank" rel="noopener">GitHub Repo</a>
+          </div>
+        </article>
+
+        <article class="project-card" data-search="interactive quiz application javascript html css">
+          <h3>Interactive Quiz Application</h3>
+          <p>A five-question "Code With AI" quiz that tracks your score and shows the final result.</p>
+          <ul class="tags"><li>HTML</li><li>CSS</li><li>JavaScript</li></ul>
+          <div class="card-links">
+            <a href="https://github.com/mitanshpradhank21-hash/Quiz-25bcon2074" target="_blank" rel="noopener">GitHub Repo</a>
+            <a href="https://quiz-ten-puce.vercel.app/" target="_blank" rel="noopener">Live App</a>
+          </div>
+        </article>
+
+        <article class="project-card" data-search="book reading list application javascript deployed">
+          <h3>Book Reading List Application</h3>
+          <p>A reading list app to add and track books, deployed online with the live link in its README.</p>
+          <ul class="tags"><li>HTML</li><li>CSS</li><li>JavaScript</li><li>Vercel</li></ul>
+          <div class="card-links">
+            <a href="https://github.com/mitanshpradhank21-hash/readinglist-25bcon2074" target="_blank" rel="noopener">GitHub Repo</a>
+            <a href="https://reading-list-lake.vercel.app/" target="_blank" rel="noopener">Live App</a>
+          </div>
+        </article>
+      </div>
+      <p id="noResults" class="no-results" hidden>No projects match your search. Try "Python", "Quiz" or "Book".</p>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section section-alt">
+      <h2>Contact Information</h2>
+      <ul class="contact-list">
+        <li><strong>Email:</strong>mitanshpradhank21@gmail.com</li>
+        <li><strong>GitHub:</strong> <a href="https://github.com/mitanshpradhank21-hash" target="_blank" rel="noopener">github.com/mitanshpradhank21-hash</a></li>
+        <li><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/mitansh-pradhan-4136b4380" target="_blank" rel="noopener">linkedin.com/in/mitansh-pradhan-4136b4380</a></li>
+        <li><strong>Location:</strong> JAIPUR, INDIA </li>
+      </ul>
+    </section>
+
+    <!-- AI CHATBOT -->
+    <section id="chatbot" class="section">
+      <h2>AI Chatbot</h2>
+      <p>Ask me anything about my skills, projects or background.</p>
+      <div class="chat-box">
+        <div id="chatMessages" class="chat-messages" aria-live="polite">
+          <div class="msg bot">Hi! Ask me something like "What projects have you completed?"</div>
+        </div>
+        <form id="chatForm" class="chat-form">
+          <label for="chatInput" class="visually-hidden">Type your question</label>
+          <input type="text" id="chatInput" placeholder="Type your question..." autocomplete="off" required>
+          <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Mitansh Pradhan. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
