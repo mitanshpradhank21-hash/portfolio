@@ -1,106 +1,79 @@
-export default async function handler(req, res) {
+// Vercel Serverless Function: POST /api/chat
+// Same Groq API (OpenAI-compatible /chat/completions),
+// but the key lives ONLY in Vercel Environment Variables (GROQ_API_KEY) — never in the repo.
+const P = require("../data.js");
+
+const BASE_URL = (process.env.GROQ_BASE_URL || "https://api.groq.com/openai/v1").replace(/\/$/, "");
+const MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-20b";
+
+function buildContext() {
+  const projects = P.projects
+    .map((p, i) => {
+      const live = p.live ? ` Live: ${p.live}.` : "";
+      return `${i + 1}. ${p.title} — ${p.description} Technologies: ${p.tech.join(", ")}. Details: ${p.details} GitHub: https://github.com/${P.github}/${p.repo}.${live}`;
+    })
+    .join("\n");
+  const skills = Object.entries(P.skills).map(([k, v]) => `${k}: ${v.join(", ")}`).join("; ");
+  return [
+    `You are the AI assistant on ${P.name}'s personal portfolio website. Answer visitors' questions using ONLY the information below.`,
+    `If something is not in the information, say you don't have that detail and suggest contacting ${P.name}. Never invent facts or personal information. Keep answers short (under 80 words). Reply in the language the visitor uses (English or Hinglish).`,
+    `NAME: ${P.name}. ${P.intro}`,
+    `ABOUT: ${P.about.join(" ")}`,
+    `EDUCATION: ${P.education.map((e) => `${e.title}, ${e.place} (${e.period})`).join("; ")}`,
+    `SKILLS: ${skills}`,
+    `PROJECTS:\n${projects}`,
+    `CONTACT: Email ${P.email}. GitHub https://github.com/${P.github}. Location ${P.location}.${P.linkedin ? " LinkedIn " + P.linkedin + "." : ""}`,
+  ].join("\n\n");
+}
+
+module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
-    return res.status(405).json({ error: "Use POST to send a chatbot question." });
+    return res.status(405).json({ error: "Method not allowed" });
   }
+  const key = process.env.GROQ_API_KEY;
+  if (!key) return res.status(500).json({ error: "Server is missing GROQ_API_KEY" });
 
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({
-      error: "Chatbot setup is incomplete: add GROQ_API_KEY in Vercel Project Settings > Environment Variables, then redeploy."
-    });
+  let body = req.body;
+  try {
+    if (typeof body === "string") body = JSON.parse(body || "{}");
+  } catch (e) {
+    return res.status(400).json({ error: "Invalid JSON" });
   }
+  body = body || {};
 
-  const question = typeof req.body?.question === "string"
-    ? req.body.question.trim()
-    : "";
+  const message = String(body.message || "").slice(0, 500).trim();
+  if (!message) return res.status(400).json({ error: "Empty message" });
 
-  if (!question) {
-    return res.status(400).json({ error: "Please type a question first." });
-  }
+  const history = (Array.isArray(body.history) ? body.history.slice(-6) : [])
+    .filter((h) => h && (h.role === "user" || h.role === "model" || h.role === "assistant") && typeof h.text === "string")
+    .map((h) => ({ role: h.role === "user" ? "user" : "assistant", content: h.text.slice(0, 1000) }));
 
-  if (question.length > 1000) {
-    return res.status(400).json({ error: "Please keep your question under 1000 characters." });
-  }
-
-  const portfolioContext = `
-You are the AI assistant on Mitansh Pradhan's personal portfolio website.
-Answer visitor questions helpfully, clearly, and concisely, using only the portfolio facts below.
-If the portfolio does not contain the answer, say that you do not have that detail and suggest contacting Mitansh. Do not invent accomplishments, skills, project features, or personal facts.
-If asked unrelated questions, politely bring the conversation back to Mitansh's portfolio.
-
-PROFILE
-- Name: Mitansh Pradhan
-- Education: B.Tech in Computer Science and Engineering, specialization in Artificial Intelligence and Machine Learning.
-- Current year: Second year.
-- University: JECRC University, Jaipur.
-- Skills listed: Python, HTML, CSS, JavaScript, Git and GitHub, Cursor AI; AI and Machine Learning (learning).
-- Interests: building programs and web applications; learning AI and ML.
-
-PROJECTS
-1. Python Programs Collection:
-   - Python programs include Factorial, Fibonacci, and Structure-to-Dictionary conversion.
-   - Repository: https://github.com/mitanshpradhank21-hash/pythonbasic-25bcon2074
-   - Additional Python basics repository: https://github.com/mitanshpradhank21-hash/pythonbasic3-25bcon2074
-2. Messy Python Code Improvement:
-   - A Python script cleaned up for readability and structure with AI assistance.
-   - Repository: https://github.com/mitanshpradhank21-hash/pythonbasic2-25bcon2074
-3. Bug Fixing Using Cursor AI:
-   - A Python debugging project focused on identifying and correcting an error with Cursor AI. The exact bug details are not specified in the portfolio.
-   - Repository: https://github.com/mitanshpradhank21-hash/buggyfix-25bcon2074
-4. Interactive Quiz Application:
-   - A five-question "Code With AI" quiz that tracks the score and displays the final result.
-   - Repository: https://github.com/mitanshpradhank21-hash/Quiz-25bcon2074
-   - Live app: https://quiz-ten-puce.vercel.app/
-5. Book Reading List Application:
-   - An app to add and track books.
-   - Repository: https://github.com/mitanshpradhank21-hash/readinglist-25bcon2074
-   - Live app: https://reading-list-lake.vercel.app/
-
-CONTACT
-- GitHub: https://github.com/mitanshpradhank21-hash
-- LinkedIn: https://www.linkedin.com/in/mitansh-pradhan-4136b4380
-- Email: mitanshpradhank21@gmail.com
-- Location listed on portfolio: Jaipur, India
-`;
+  const messages = [{ role: "system", content: buildContext() }, ...history, { role: "user", content: message }];
 
   try {
-    const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const r = await fetch(`${BASE_URL}/chat/completions`, {
       method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + key },
       body: JSON.stringify({
-        model: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
-        messages: [
-          { role: "system", content: portfolioContext },
-          { role: "user", content: question }
-        ],
-        temperature: 0.3,
-        max_tokens: 500
-      })
+        model: MODEL,
+        temperature: 0.4,
+        reasoning_effort: "low",
+        max_completion_tokens: 800,
+        messages,
+      }),
     });
-
-    const result = await groqResponse.json().catch(() => ({}));
-
-    if (!groqResponse.ok) {
-      console.error("Groq API error:", groqResponse.status, result?.error?.message || "Unknown error");
-      return res.status(502).json({
-        error: "The AI service could not answer right now. Please check the Groq API key/model settings and try again."
-      });
+    if (r.status === 429) return res.status(429).json({ error: "Too many requests. Please wait and try again." });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      console.error("Groq error:", r.status, JSON.stringify(data));
+      return res.status(502).json({ error: data.error?.message || "Upstream API error" });
     }
-
-    const answer = result?.choices?.[0]?.message?.content;
-    if (typeof answer !== "string" || !answer.trim()) {
-      return res.status(502).json({ error: "The AI service returned an empty answer. Please try again." });
-    }
-
-    return res.status(200).json({ answer: answer.trim() });
-  } catch (error) {
-    console.error("Chatbot request failed:", error);
-    return res.status(500).json({
-      error: "A server error occurred while contacting the AI service. Please try again later."
-    });
+    const reply = data.choices?.[0]?.message?.content;
+    if (typeof reply !== "string" || !reply.trim()) return res.status(502).json({ error: "Empty response from model" });
+    return res.status(200).json({ reply: reply.trim() });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to reach the AI service" });
   }
-}
+};
